@@ -53,9 +53,9 @@ install_bbr() {
 install_docker() {
     if ! [ -x "$(command -v docker)" ]; then
         echo "开始安装 Docker CE"
-        curl -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
         sudo add-apt-repository \
-            "deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu \
+            "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
             $(lsb_release -cs) \
             stable"
         sudo apt-get update -qq
@@ -136,7 +136,7 @@ install_gost() {
     sudo docker run -d --name gost \
         -v ${CERT_DIR}:${CERT_DIR}:ro \
         --net=host ginuerzh/gost \
-        -L "http2://${USER}:${PASS}@${BIND_IP}:${PORT}?cert=${CERT}&key=${KEY}&probe_resist=code:400"
+        -L "http2://${USER}:${PASS}@${BIND_IP}:${PORT}?cert=${CERT}&key=${KEY}&probe_resist=code:400&knock=www.google.com"
 }
 
 crontab_exists() {
@@ -145,7 +145,7 @@ crontab_exists() {
 
 create_cron_job(){
     # 写入前先检查，避免重复任务。
-    if ! crontab_exists "cerbot renew --force-renewal"; then
+    if ! crontab_exists "certbot renew --force-renewal"; then
         echo "0 0 1 * * /usr/bin/certbot renew --force-renewal" >> /var/spool/cron/crontabs/root
         echo "${COLOR_SUCC}成功安装证书renew定时作业！${COLOR_NONE}"
     else
